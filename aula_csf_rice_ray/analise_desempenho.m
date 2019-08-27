@@ -2,25 +2,37 @@ clear all
 close all
 clc
 
+% Numero de Bits
 num_bits = 1e6;
+
+% Taxa de simbolos (equivalente a taxa de transmissão)
 Rs = 100e3;
+
+% Efeito Doppler
 fd = 300;
+
+% K da formula Rice, quanto maior menor a influencia do multipercurso
 k = 1;
 
-M = 2; %Ordem da modulação
+%Ordem da modulação (representa a eração de bits)
+M = 2; 
 
+% Gerando Iinformação a ser transmitida (utilizando o BPSK)
 info = randint(num_bits,1,M);
-info_mod = pskmod(info,2);
+info_mod = pskmod(info,M);
 
+% Gerando os canais de rayleigh e Rice
 canal_ray = rayleighchan(1/Rs, fd);
 canal_ric = ricianchan(1/Rs,fd,k);
 
 canal_ray.StoreHistory = 1;
 canal_ric.StoreHistory = 1;
 
+% Sinal Transmitido do Transmissor
 sinal_rec_ray = filter(canal_ray, info_mod);
 sinal_rec_ric = filter(canal_ric, info_mod);
 
+% Ganho dos canais
 ganho_ray = canal_ray.PathGains;
 ganho_ric = canal_ric.PathGains;
 
@@ -43,6 +55,7 @@ for SNR = 0:30
 end
 
 figure(1)
+% Plotando em escala logaritma no Y
 semilogy([0:30],taxa_ray,'r',[0:30],taxa_ric,'b');
 grid on
 
